@@ -1,3 +1,14 @@
+#Global Option
+server:
+  port: 8080
+  servlet:
+    encoding:
+      force-response: true
+logging:
+  config: classpath:logback/logback-spring.xml
+
+---
+
 spring:
   profiles: local
   datasource:
