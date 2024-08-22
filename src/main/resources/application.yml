@@ -1,1 +1,7 @@
-spring.application.name=pofol
+spring:
+  profiles: local
+  datasource:
+    driver-class-name: ""
+    url: ""
+    username: ""
+    password: ""
