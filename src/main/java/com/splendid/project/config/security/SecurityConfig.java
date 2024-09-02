@@ -10,14 +10,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+    private final LogOutSuccessHandler logOutSuccessHandler;
 
 	@Bean
     public PasswordEncoder passwordEncoder() {
@@ -43,7 +42,12 @@ public class SecurityConfig {
                             .permitAll()
                             .successHandler(loginSuccessHandler)
                             .failureHandler(loginFailureHandler)
-            );
+            )
+            .logout(logout ->
+                    logout
+                            .invalidateHttpSession(true)
+                            .deleteCookies("JSESSIONID")
+                            .logoutSuccessHandler(logOutSuccessHandler));
         return http.build();
     }
 }
