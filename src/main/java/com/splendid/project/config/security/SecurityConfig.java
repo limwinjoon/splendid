@@ -18,6 +18,7 @@ public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final LogOutSuccessHandler logOutSuccessHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
 	@Bean
     public PasswordEncoder passwordEncoder() {
@@ -32,26 +33,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorizeRequests ->
-                    authorizeRequests
-                            .requestMatchers("/").permitAll()
-                            .anyRequest().authenticated()
-            )
-            .formLogin(formLogin ->
-                    formLogin
-                            .loginPage("/")
-                            .permitAll()
-                            .successHandler(loginSuccessHandler)
-                            .failureHandler(loginFailureHandler)
-            )
-            .logout(logout ->
-                    logout
-                            .invalidateHttpSession(true)
-                            .deleteCookies("JSESSIONID")
-                            .logoutSuccessHandler(logOutSuccessHandler));
-        http
-            .csrf(csrf ->
-                    csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/").permitAll()
+                                .anyRequest().authenticated()
+                )
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling
+                                .accessDeniedHandler(customAccessDeniedHandler)
+                )
+                .formLogin(formLogin ->
+                        formLogin
+                                .loginPage("/")
+                                .permitAll()
+                                .successHandler(loginSuccessHandler)
+                                .failureHandler(loginFailureHandler)
+                )
+                .logout(logout ->
+                        logout
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID")
+                                .logoutSuccessHandler(logOutSuccessHandler)
+                )
+                .csrf(csrf ->
+                        csrf
+                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                );
 
         return http.build();
     }
