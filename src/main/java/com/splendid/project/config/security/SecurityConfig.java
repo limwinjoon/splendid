@@ -16,6 +16,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
 
 	@Bean
     public PasswordEncoder passwordEncoder() {
@@ -30,10 +32,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        .authorizeRequests((authz) -> authz
-                .anyRequest().authenticated()
-        )
-                .httpBasic(withDefaults());
+            .authorizeHttpRequests(authorizeRequests ->
+                    authorizeRequests
+                            .requestMatchers("/").permitAll()
+                            .anyRequest().authenticated()
+            )
+            .formLogin(formLogin ->
+                    formLogin
+                            .loginPage("/")
+                            .permitAll()
+                            .successHandler(loginSuccessHandler)
+                            .failureHandler(loginFailureHandler)
+            );
         return http.build();
     }
 }
